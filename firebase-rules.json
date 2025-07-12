@@ -1,0 +1,33 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "products": {
+      ".indexOn": ["sellerId"],
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "Products": {
+      ".indexOn": ["sellerId"],
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "sellers": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "users": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "brands": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "orders": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["userId", "sellerId"]
+    }
+  }
+}
