@@ -7,7 +7,7 @@ export const OneSignalProvider = () => {
     const initOneSignal = async () => {
       await OneSignal.init({
         // OneSignal.init({
-        appId: "fc2657f2-2b10-4b7d-a23a-9d4113b0027a",
+        appId: "d2bc8f72-d654-4b6e-8554-aa3dd5d38bda",
         safari_web_id: "web.onesignal.auto.YOUR-ID", // replace if needed
         allowLocalhostAsSecureOrigin: true,
         notifyButton: {

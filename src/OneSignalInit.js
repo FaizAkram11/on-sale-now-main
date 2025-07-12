@@ -3,7 +3,7 @@ import OneSignal from 'react-onesignal';
 export const initializeOneSignal = async () => {
   try {
     await OneSignal.init({
-      appId: "fc2657f2-2b10-4b7d-a23a-9d4113b0027a",
+      appId: "d2bc8f72-d654-4b6e-8554-aa3dd5d38bda",
       safari_web_id: "YOUR_SAFARI_WEB_ID", // Optional: Only needed if you want Safari push
       notifyButton: {
         enable: true, // Shows the bell icon in the bottom right
