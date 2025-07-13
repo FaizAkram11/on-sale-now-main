@@ -30,7 +30,7 @@ const Navbar = ({ user, onUserChange }) => {
   const categories = [
     { name: "Men", path: "/category/men" },
     { name: "Women", path: "/category/women" },
-    { name: "Kids", path: "/category/kids" },
+    // { name: "Kids", path: "/category/kids" },
     { name: "Footwear", path: "/category/footwear" },
     { name: "Accessories", path: "/category/accessories" },
     { name: "Beauty", path: "/category/beauty" },

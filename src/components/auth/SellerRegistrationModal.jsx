@@ -16,7 +16,7 @@ const SellerRegistrationModal = ({ show, onHide, user, onSellerRegistrationSucce
     businessDescription: "",
     website: "",
     storeCategory: "",
-    taxId: "",
+    taxId: "123",
     password: "",
     confirmPassword: "",
     agreedToPolicy: false
@@ -286,7 +286,7 @@ const SellerRegistrationModal = ({ show, onHide, user, onSellerRegistrationSucce
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col md={6}>
+            {/* <Col md={6}>
               <Form.Group className="mb-3">
                 <Form.Label>Tax ID / GST Number (Optional)</Form.Label>
                 <Form.Control
@@ -297,7 +297,7 @@ const SellerRegistrationModal = ({ show, onHide, user, onSellerRegistrationSucce
                   onChange={handleChange}
                 />
               </Form.Group>
-            </Col>
+            </Col> */}
           </Row>
 
           <Form.Group className="mb-3">

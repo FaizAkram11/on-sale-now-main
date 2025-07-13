@@ -12,11 +12,11 @@ const AdminSidebar = () => {
     { icon: "bi-speedometer2", label: "Dashboard", path: "/admin/dashboard" },
     { icon: "bi-box-seam", label: "Products", path: "/admin/products" },
     { icon: "bi-people", label: "Users", path: "/admin/users" },
-    { icon: "bi-bag", label: "Orders", path: "/admin/orders" },
-    { icon: "bi-cloud-download", label: "Scraping", path: "/admin/scraping" },
-    { icon: "bi-tag", label: "Categories", path: "/admin/categories" },
+    // { icon: "bi-bag", label: "Orders", path: "/admin/orders" },
+    // { icon: "bi-cloud-download", label: "Scraping", path: "/admin/scraping" },
+    // { icon: "bi-tag", label: "Categories", path: "/admin/categories" },
     { icon: "bi-graph-up", label: "Analytics", path: "/admin/analytics" },
-    { icon: "bi-gear", label: "Settings", path: "/admin/settings" },
+    // { icon: "bi-gear", label: "Settings", path: "/admin/settings" },
   ]
 
   return (

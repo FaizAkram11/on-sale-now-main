@@ -13,7 +13,7 @@ const SellerSidebar = () => {
     { icon: "bi-box-seam", label: "Products", path: "/seller/products" },
     { icon: "bi-bag", label: "Orders", path: "/seller/orders" },
     { icon: "bi-graph-up", label: "Analytics", path: "/seller/analytics" },
-    { icon: "bi-cash-coin", label: "Earnings", path: "/seller/earnings" },
+    // { icon: "bi-cash-coin", label: "Earnings", path: "/seller/earnings" },
     { icon: "bi-gear", label: "Settings", path: "/seller/settings" },
   ]
 

@@ -31,7 +31,7 @@ const AdminHeader = () => {
         </Form>
 
         <Nav className="ms-auto d-flex align-items-center">
-          <Nav.Link href="#" className="me-3 position-relative">
+          {/* <Nav.Link href="#" className="me-3 position-relative">
             <i className="bi bi-bell fs-5"></i>
             <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
               3<span className="visually-hidden">unread notifications</span>
@@ -40,7 +40,7 @@ const AdminHeader = () => {
 
           <Nav.Link href="#" className="me-3">
             <i className="bi bi-envelope fs-5"></i>
-          </Nav.Link>
+          </Nav.Link> */}
 
           <Dropdown align="end">
             <Dropdown.Toggle as="div" className="d-flex align-items-center" style={{ cursor: "pointer" }}>
