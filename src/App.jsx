@@ -34,7 +34,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Spinner } from "react-bootstrap";
 import { initializeOneSignal } from "./OneSignalInit";
 import { addBrandTagToOneSignal } from "./OneSignalInit";
-import { OneSignalProvider } from "./OneSignalProvider.jsx";
+// import { OneSignalProvider } from "./OneSignalProvider.jsx";
 import { onAuthStateChanged } from "firebase/auth"; // Assuming you use Firebase Auth
 import { auth } from "./firebase/config"; // Your Firebase config
 import OneSignal from "react-onesignal";
@@ -181,9 +181,12 @@ function App() {
                 });
               }
 
-              console.log("Sending tags to OneSignal:", tags);
-              await OneSignal.User.addTags(tags);
-              console.log("Tags sent successfully");
+              if (tags && Object.keys(tags).length > 0) {
+                await OneSignal.User.addTags(tags);
+                console.log("Tags sent successfully");
+              } else {
+                console.warn("Skipped sending tags: empty or invalid tag object");
+              }
             } catch (err) {
               console.error("OneSignal login or tag sync failed:", err);
             }
