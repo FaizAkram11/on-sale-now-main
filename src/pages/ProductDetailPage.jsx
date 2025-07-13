@@ -44,6 +44,7 @@ const ProductDetailPage = () => {
         const result = await getProductById(productId)
 
         if (result.success) {
+          console.log("product is", result.data);
           setProduct(result.data)
           // Set default selected color if available
           if (result.data.colors && result.data.colors.length > 0) {
@@ -80,20 +81,31 @@ const ProductDetailPage = () => {
   const parsePrice = (priceValue) => {
     if (!priceValue) return 0
 
+    // If it's already a number, return it
+    if (typeof priceValue === 'number') {
+      return priceValue
+    }
+
     // Convert to string if it's not already
     const priceStr = String(priceValue)
 
-    // Remove currency symbols and any non-numeric characters except decimal point
+    // Remove currency symbols, commas, and any non-numeric characters except decimal point
     const cleanPrice = priceStr.replace(/[^0-9.]/g, "")
 
     return Number.parseFloat(cleanPrice) || 0
   }
 
   // Function to calculate discount percentage with safety checks
-  const calculateDiscount = (originalPrice, price) => {
+  const calculateDiscount = (originalPrice, price, discountedPrice) => {
     // Parse prices to remove currency symbols and get numeric values
     const original = parsePrice(originalPrice)
     const current = parsePrice(price)
+    const discounted = parsePrice(discountedPrice)
+
+    // If discountedPrice is available, use it for calculation
+    if (discounted > 0 && original > 0 && discounted < original) {
+      return Math.round(((original - discounted) / original) * 100)
+    }
 
     // Check if both are valid numbers and original is greater than current
     if (original > 0 && current > 0 && original > current) {
@@ -112,6 +124,14 @@ const ProductDetailPage = () => {
 
     const original = parsePrice(product.originalPrice)
     const current = parsePrice(product.price)
+    const discounted = parsePrice(product.discountedPrice)
+
+    // Check if discountedPrice is less than originalPrice
+    if (discounted > 0 && original > 0 && discounted < original) {
+      return true
+    }
+
+    // Fallback to current price vs original price
     return original > 0 && current > 0 && original > current
   }
 
@@ -120,6 +140,33 @@ const ProductDetailPage = () => {
     const numericPrice = parsePrice(priceValue)
     return numericPrice.toLocaleString()
   }
+
+  // Function to get the current display price (prioritize discountedPrice if available)
+  const getCurrentPrice = (product) => {
+    const discounted = parsePrice(product.discountedPrice);
+    const current = parsePrice(product.price);
+    
+    // If discountedPrice is available and valid, use it
+    if (discounted > 0) {
+      return discounted;
+    }
+    
+    // Otherwise use current price
+    return current;
+  }
+
+  // Function to calculate total price based on quantity
+  const getTotalPrice = (product, qty) => {
+    const currentPrice = getCurrentPrice(product);
+    return currentPrice * qty;
+  }
+
+  // Helper to fix image URLs with width=1
+  const getFixedImageUrl = (url) => {
+    if (!url) return url;
+    // Remove &width=1 or ?width=1 from the URL
+    return url.replace(/[&?]width=1/, '');
+  };
 
   // Handle add to cart
   const handleAddToCart = () => {
@@ -164,8 +211,15 @@ const ProductDetailPage = () => {
 
   // Handle buy now
   const handleBuyNow = () => {
-    handleAddToCart()
-    navigate("/cart")
+    // Check if product has an external URL for buying
+    if (product.product_detail_page_url) {
+      // Open external URL in new tab
+      window.open(product.product_detail_page_url, '_blank');
+    } else {
+      // Fallback to current cart flow
+      handleAddToCart()
+      navigate("/cart")
+    }
   }
 
   if (loading) {
@@ -194,7 +248,7 @@ const ProductDetailPage = () => {
   if (product.discountPercent && !isNaN(Number(product.discountPercent))) {
     discountPercent = Number(product.discountPercent)
   } else {
-    discountPercent = calculateDiscount(product.originalPrice, product.price)
+    discountPercent = calculateDiscount(product.originalPrice, product.price, product.discountedPrice)
   }
 
   return (
@@ -219,7 +273,7 @@ const ProductDetailPage = () => {
           <div className="position-relative">
             <Image
               ref={productImageRef}
-              src={product.image || "/placeholder.svg?height=600&width=500&query=product"}
+              src={getFixedImageUrl(product.image) || "/placeholder.svg?height=600&width=500&query=product"}
               alt={product.name}
               fluid
               className="product-main-image"
@@ -246,7 +300,7 @@ const ProductDetailPage = () => {
               {product.additionalImages.map((img, index) => (
                 <Col key={index} xs={3} className="mb-2">
                   <Image
-                    src={img || "/placeholder.svg"}
+                    src={getFixedImageUrl(img) || "/placeholder.svg"}
                     alt={`${product.name} view ${index + 1}`}
                     thumbnail
                     className="cursor-pointer"
@@ -274,14 +328,21 @@ const ProductDetailPage = () => {
           <h2 className="mb-2">{product.name}</h2>
 
           <div className="d-flex align-items-center mb-3">
-            <h3 className="fw-bold mb-0">Rs. {displayPrice(product.price)}</h3>
+            <h3 className="fw-bold mb-0">
+              Rs. {displayPrice(getTotalPrice(product, quantity))}
+            </h3>
             {hasDiscount(product) && (
               <>
                 <span className="text-muted text-decoration-line-through ms-3">
-                  Rs. {displayPrice(product.originalPrice)}
+                  Rs. {displayPrice(parsePrice(product.originalPrice) * quantity)}
                 </span>
                 {discountPercent > 0 && <span className="text-danger ms-3">({discountPercent}% OFF)</span>}
               </>
+            )}
+            {quantity > 1 && (
+              <span className="text-muted small ms-2">
+                (Rs. {displayPrice(getCurrentPrice(product))} each)
+              </span>
             )}
           </div>
 
@@ -447,7 +508,7 @@ const ProductDetailPage = () => {
         <div
           className="flying-cart-item"
           style={{
-            backgroundImage: `url(${product.image || "/stylish-streetwear-collection.png"})`,
+            backgroundImage: `url(${getFixedImageUrl(product.image) || "/stylish-streetwear-collection.png"})`,
           }}
         ></div>
       )}
