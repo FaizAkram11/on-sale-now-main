@@ -75,8 +75,8 @@ export const removeBrandTagFromOneSignal = async (brandName) => {
 // Function to get the OneSignal User ID (useful for debugging)
 export const getOneSignalUserId = async () => {
   try {
-    const deviceState = await OneSignal.getDeviceState();
-    return deviceState.userId;
+    const userId = await OneSignal.getUserId();
+    return userId;
   } catch (error) {
     console.error("Error getting OneSignal User ID:", error);
     return null;
