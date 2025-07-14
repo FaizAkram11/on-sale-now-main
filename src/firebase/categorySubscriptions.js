@@ -62,10 +62,7 @@ export const subscribeToCategory = async (userId, categoryName, fcmToken) => {
 
     // await addBrandTagToOneSignal(brandName);
     const tagKey = `category_${categoryName.replace(/\s+/g, "_").toLowerCase()}`;
-    if (Object.keys(tags).length > 0) {
       await OneSignal.User.addTags({ [tagKey]: "true" });
-
-    }
     // if (typeof window !== "undefined" && window.OneSignal) {
     //   window.OneSignal.push(function () {
     //     window.OneSignal.sendTags({ [tagKey]: "true" });
@@ -168,7 +165,6 @@ export const toggleCategorySubscription = async (
       //   window.OneSignal.deleteTag(tagKey);
       // });
     } else {
-      await OneSignal.User.addTags({ [tagKey]: "true" });
       // window.OneSignal.push(function () {
       //   window.OneSignal.sendTags({ [tagKey]: "true" });
       // });
