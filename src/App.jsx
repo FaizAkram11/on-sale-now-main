@@ -111,50 +111,52 @@ function App() {
   useEffect(() => {
     const initOneSignalAndSetTags = async () => {
       try {
-        const success = await initializeOneSignal(); // call from OneSignalInit.js
+        const success = await initializeOneSignal();
         if (!success) return;
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
             try {
-              await OneSignal.login(user.uid);
+              const userId = user.uid;
 
-              // Fetch brand subscriptions
-              const brandRes = await getUserBrandSubscriptions(user.uid);
-              // Fetch category subscriptions
-              const categoryRes = await getUserCategorySubscriptions(user.uid);
+              // Avoid re-logging in or duplicate tagging
+              const state = await OneSignal.User.getSubscription();
+              if (!state || !state.id || !(await OneSignal.getUserId())) {
+                await OneSignal.login(userId);
+              }
+
+              // Wait for session to stabilize
+              await OneSignal.User.ensureSession();
+
+              // Fetch brand and category subscriptions
+              const brandRes = await getUserBrandSubscriptions(userId);
+              const categoryRes = await getUserCategorySubscriptions(userId);
 
               const tags = {};
 
-              // Add brand tags
               if (brandRes.success && brandRes.data) {
                 brandRes.data.forEach((sub) => {
                   if (sub.active) {
-                    const tagKey = `brand_${sub.brandName
-                      .replace(/\s+/g, "_")
-                      .toLowerCase()}`;
-                    tags[tagKey] = "true";
+                    const key = `brand_${sub.brandName.replace(/\s+/g, "_").toLowerCase()}`;
+                    tags[key] = "true";
                   }
                 });
               }
 
-              // Add category tags
               if (categoryRes.success && categoryRes.data) {
                 categoryRes.data.forEach((sub) => {
                   if (sub.active) {
-                    const tagKey = `category_${sub.categoryName
-                      .replace(/\s+/g, "_")
-                      .toLowerCase()}`;
-                    tags[tagKey] = "true";
+                    const key = `category_${sub.categoryName.replace(/\s+/g, "_").toLowerCase()}`;
+                    tags[key] = "true";
                   }
                 });
               }
 
-              if (tags && Object.keys(tags).length > 0) {
+              if (Object.keys(tags).length > 0) {
                 await OneSignal.User.addTags(tags);
-                console.log("Tags sent successfully");
+                console.log("✅ Tags sent successfully");
               } else {
-                console.warn("Skipped sending tags: empty or invalid tag object");
+                console.warn(" Skipped sending tags: empty or invalid tag object");
               }
             } catch (err) {
               console.error("OneSignal login or tag sync failed:", err);
@@ -164,7 +166,7 @@ function App() {
 
         return unsubscribe;
       } catch (err) {
-        console.error("OneSignal initialization failed:", err);
+        console.error("❌ OneSignal initialization failed:", err);
       }
     };
 
@@ -176,6 +178,7 @@ function App() {
       });
     };
   }, []);
+
 
   // useEffect(() => {
   //   const setupOneSignal = async () => {
