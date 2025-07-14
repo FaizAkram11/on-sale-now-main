@@ -9,7 +9,7 @@ import {
   remove,
 } from "firebase/database";
 import { database } from "./config";
-import { addBrandTagToOneSignal, removeBrandTagFromOneSignal } from '../OneSignalInit';
+import { addBrandTagToOneSignal, removeBrandTagFromOneSignal, getOneSignalUserId } from '../OneSignalInit';
 import OneSignal from "react-onesignal";
 
 // Create a new brand subscription
@@ -62,6 +62,8 @@ export const subscribeToBrand = async (userId, brandName, fcmToken) => {
 
     // await addBrandTagToOneSignal(brandName);
     const tagKey = `brand_${brandName.replace(/\s+/g, "_").toLowerCase()}`;
+    await getOneSignalUserId();
+
     await OneSignal.User.addTags({ [tagKey]: "true" });
     // if (typeof window !== "undefined" && window.OneSignal) {
     //   window.OneSignal.push(function () {
@@ -165,6 +167,7 @@ export const toggleBrandSubscription = async (
       //   window.OneSignal.deleteTag(tagKey);
       // });
     } else {
+      await getOneSignalUserId();
       await OneSignal.User.addTags({ [tagKey]: "true" });
       // window.OneSignal.push(function () {
       //   window.OneSignal.sendTags({ [tagKey]: "true" });
