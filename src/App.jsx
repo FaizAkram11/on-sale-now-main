@@ -32,7 +32,6 @@ import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Spinner } from "react-bootstrap";
-import { initializeOneSignal } from "./OneSignalInit";
 import { addBrandTagToOneSignal } from "./OneSignalInit";
 // import { OneSignalProvider } from "./OneSignalProvider.jsx";
 import { onAuthStateChanged } from "firebase/auth"; // Assuming you use Firebase Auth
@@ -56,7 +55,7 @@ import SellerOrderDetailPage from "./pages/seller/SellerOrderDetailPage";
 import SellerAnalytics from "./pages/seller/SellerAnalytics";
 import SellerEarnings from "./pages/seller/SellerEarnings";
 import SellerSettings from "./pages/seller/SellerSettings";
-
+import {initializeOneSignal} from './OneSignalInit.js';
 // Admin Route Protection
 const AdminRoute = ({ children }) => {
   const adminUser = localStorage.getItem("adminUser");
@@ -112,38 +111,8 @@ function App() {
   useEffect(() => {
     const initOneSignalAndSetTags = async () => {
       try {
-        await OneSignal.init({
-          appId: "d2bc8f72-d654-4b6e-8554-aa3dd5d38bda",
-          safari_web_id: "web.onesignal.auto.YOUR-ID",
-          allowLocalhostAsSecureOrigin: true,
-          serviceWorkerPath: "OneSignalSDKWorker.js",
-          serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
-          serviceWorkerParam: {
-            scope: "/",
-          },
-          notifyButton: {
-            enable: true,
-          },
-          promptOptions: {
-            slidedown: {
-              prompts: [
-                {
-                  type: "push",
-                  autoPrompt: true,
-                  text: {
-                    actionMessage: "Would you like to receive notifications?",
-                    acceptButton: "Yes",
-                    cancelButton: "No",
-                  },
-                  delay: {
-                    pageViews: 1,
-                    timeDelay: 10,
-                  },
-                },
-              ],
-            },
-          },
-        });
+        const success = await initializeOneSignal(); // call from OneSignalInit.js
+        if (!success) return;
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
