@@ -34,13 +34,13 @@ const CategorySection = () => {
       imageUrl: "/chic-essentials.png",
       isSubscribed: false,
     },
-    {
-      id: 3,
-      name: "Kids",
-      path: "/category/kids",
-      imageUrl: "/placeholder.svg?key=1jq22",
-      isSubscribed: false,
-    },
+    // {
+    //   id: 3,
+    //   name: "Kids",
+    //   path: "/category/kids",
+    //   imageUrl: "/placeholder.svg?key=1jq22",
+    //   isSubscribed: false,
+    // },
     {
       id: 4,
       name: "Footwear",
@@ -135,8 +135,10 @@ const CategorySection = () => {
 
   return (
     <Container fluid className="my-5 px-4 px-md-5">
-      <h2 className="text-center mb-4 fw-bold">SHOP BY CATEGORY</h2>
-      <Row>
+      <div className="text-center mb-4">
+        <h2 className="fw-bold">SHOP BY CATEGORY</h2>
+      </div>
+      <Row className="justify-content-center">
         {categories.map((category) => (
           <Col
             key={category.id}

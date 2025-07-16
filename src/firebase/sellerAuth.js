@@ -14,7 +14,7 @@ import {
   equalTo,
 } from "firebase/database";
 import { auth, database } from "./config";
-import axios from "axios"
+import axios from "axios";
 
 // Register a new seller
 export const registerSeller = async (uid, sellerData) => {
@@ -199,7 +199,10 @@ export const addSellerProduct = async (sellerId, productData) => {
     }
 
     for (const subId in categorySubscriptions) {
-      if (subId.endsWith(`_${categoryKey}`) && categorySubscriptions[subId].active) {
+      if (
+        subId.endsWith(`_${categoryKey}`) &&
+        categorySubscriptions[subId].active
+      ) {
         hasCategorySubscribers = true;
         break;
       }
@@ -209,8 +212,11 @@ export const addSellerProduct = async (sellerId, productData) => {
     if (hasBrandSubscribers) {
       try {
         const title = `New in ${productData.brand}`;
-        const content = `${productData.name} is now available for ${productData.price || ""}`;
-        const includeImage = productData.images && productData.images.length > 0;
+        const content = `${productData.name} is now available for ${
+          productData.price || ""
+        }`;
+        const includeImage =
+          productData.images && productData.images.length > 0;
 
         const brandPayload = {
           app_id: "fc2657f2-2b10-4b7d-a23a-9d4113b0027a",
@@ -260,7 +266,8 @@ export const addSellerProduct = async (sellerId, productData) => {
       try {
         const title = `New in ${productData.category}`;
         const content = `${productData.name} has arrived in ${productData.category}`;
-        const includeImage = productData.images && productData.images.length > 0;
+        const includeImage =
+          productData.images && productData.images.length > 0;
 
         const categoryPayload = {
           app_id: "fc2657f2-2b10-4b7d-a23a-9d4113b0027a",
@@ -317,7 +324,6 @@ export const addSellerProduct = async (sellerId, productData) => {
     };
   }
 };
-
 
 // Get all products for a seller
 export const getSellerProducts = async (sellerId) => {
@@ -507,7 +513,7 @@ export const getSellerProfile = async (sellerId) => {
 };
 
 export const toggleSellerBlockStatus = async (sellerId, status) => {
-  const isBlocked = status?.status == "blocked" ? true : false
+  const isBlocked = status?.status == "blocked" ? true : false;
   try {
     // 1. Update seller
     await update(ref(database, `Seller/${sellerId}`), {
@@ -518,7 +524,7 @@ export const toggleSellerBlockStatus = async (sellerId, status) => {
     // 2. Get all products by that seller
     const result = await getSellerProducts(sellerId);
     if (!result.success) throw new Error(result.error);
-    console.log("boss1 seller's prod:- ", result)
+    console.log("boss1 seller's prod:- ", result);
     // 3. Update all their products
     const updatePromises = result.data.map((product) =>
       updateSellerProduct(product.id, {
@@ -535,6 +541,26 @@ export const toggleSellerBlockStatus = async (sellerId, status) => {
   }
 };
 
+// Update seller status
+export const updateSellerStatus = async (sellerId, status) => {
+  try {
+    const sellerRef = ref(database, `Seller/${sellerId}`);
+    await update(sellerRef, {
+      status: status,
+      updatedAt: new Date().toISOString(),
+    });
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error updating seller status:", error);
+    return {
+      success: false,
+      error: "Failed to update seller status",
+    };
+  }
+};
 
 // Check if a seller is blocked
 export const isSellerBlocked = async (sellerId) => {
