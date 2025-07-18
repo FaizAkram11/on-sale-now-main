@@ -50,6 +50,12 @@ const SellerRegistrationModal = ({ show, onHide, user, onSellerRegistrationSucce
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    // Restrict numeric input for names
+    if ((name === 'firstName' || name === 'lastName') && /\d/.test(value)) {
+      return; // Don't update if numeric characters are entered
+    }
+    
     setFormData((prevData) => ({
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
@@ -92,11 +98,14 @@ const SellerRegistrationModal = ({ show, onHide, user, onSellerRegistrationSucce
       errors.email = "Please enter a valid email address";
     }
 
-    // Phone Number validation
+    // Pakistani Phone Number validation
     if (!formData.phoneNumber.trim()) {
       errors.phoneNumber = "Phone number is required";
-    } else if (!/^[\+]?[1-9][\d]{0,15}$/.test(formData.phoneNumber.replace(/\s/g, ''))) {
-      errors.phoneNumber = "Please enter a valid phone number";
+    } else {
+      const phoneRegex = /^03\d{9}$/;
+      if (!phoneRegex.test(formData.phoneNumber.trim())) {
+        errors.phoneNumber = "Please enter a valid Pakistani phone number (e.g., 03xxxxxxxxx)";
+      }
     }
 
     // Address validation
@@ -310,10 +319,12 @@ const SellerRegistrationModal = ({ show, onHide, user, onSellerRegistrationSucce
               <Form.Control
                 type="tel"
                 name="phoneNumber"
-                placeholder="Phone number"
+                placeholder="03xxxxxxxxx"
                 value={formData.phoneNumber}
                 onChange={handleChange}
+                maxLength={11}
               />
+              <Form.Text className="text-muted">Enter your Pakistani phone number (e.g., 03xxxxxxxxx)</Form.Text>
               {validationErrors.phoneNumber && <Form.Text className="text-danger">{validationErrors.phoneNumber}</Form.Text>}
             </Form.Group>
 

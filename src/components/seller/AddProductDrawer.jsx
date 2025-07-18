@@ -19,6 +19,8 @@ const AddProductDrawer = ({ show, onHide, seller, onProductAdded, onProductUpdat
     discountPercent: "",
     stock: "",
     sold: 0,
+    saleStartDate: "",
+    saleEndDate: "",
   }
 
   const [formData, setFormData] = useState(initialFormState)
@@ -36,6 +38,14 @@ const AddProductDrawer = ({ show, onHide, seller, onProductAdded, onProductUpdat
       if (editProduct) {
         // Populate form with existing product data for editing
         console.log("Populating form with edit product data:", editProduct) // Add this debug log
+        
+        // Format dates for date inputs (YYYY-MM-DD format)
+        const formatDateForInput = (dateString) => {
+          if (!dateString) return "";
+          const date = new Date(dateString);
+          return date.toISOString().split('T')[0];
+        };
+        
         setFormData({
           name: editProduct.name || "",
           brand: editProduct.brand || "",
@@ -50,6 +60,8 @@ const AddProductDrawer = ({ show, onHide, seller, onProductAdded, onProductUpdat
           discountPercent: editProduct.discountPercent || "",
           stock: editProduct.stock || "",
           sold: editProduct.sold || 0,
+          saleStartDate: formatDateForInput(editProduct.saleStartDate),
+          saleEndDate: formatDateForInput(editProduct.saleEndDate),
         })
       } else {
         // Reset form for adding new product
@@ -100,6 +112,15 @@ const AddProductDrawer = ({ show, onHide, seller, onProductAdded, onProductUpdat
         throw new Error("Name, price, stock, category, and image are required")
       }
 
+      // Validate date fields
+      if (formData.saleStartDate && formData.saleEndDate) {
+        const startDate = new Date(formData.saleStartDate);
+        const endDate = new Date(formData.saleEndDate);
+        if (startDate >= endDate) {
+          throw new Error("Sale end date must be after sale start date")
+        }
+      }
+
       // Check if seller exists before accessing its properties
       if (!seller) {
         throw new Error("Seller information is not available")
@@ -138,7 +159,9 @@ const AddProductDrawer = ({ show, onHide, seller, onProductAdded, onProductUpdat
         sellerId: seller.id,
         onSale: true, // All products are on sale by default
         stock: Number.parseFloat(formData.stock),
-        sold : formData.sold
+        sold : formData.sold,
+        saleStartDate: formData.saleStartDate || null,
+        saleEndDate: formData.saleEndDate || null,
       }
 
       // Only include image if it's changed or new
@@ -375,6 +398,33 @@ const AddProductDrawer = ({ show, onHide, seller, onProductAdded, onProductUpdat
               required
             />
           </Form.Group>
+
+          <Row className="mb-3">
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Sale Start Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="saleStartDate"
+                  value={formData.saleStartDate}
+                  onChange={handleChange}
+                />
+                <Form.Text className="text-muted">When the sale begins (optional)</Form.Text>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Sale End Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="saleEndDate"
+                  value={formData.saleEndDate}
+                  onChange={handleChange}
+                />
+                <Form.Text className="text-muted">When the sale ends (optional)</Form.Text>
+              </Form.Group>
+            </Col>
+          </Row>
 
           <Form.Group className="mb-4">
             <Form.Label>Product Image {!isEditing && <span className="text-danger">*</span>}</Form.Label>

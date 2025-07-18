@@ -30,10 +30,68 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
   const [animateToCart, setAnimateToCart] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(null)
   const productImageRef = useRef(null)
   const cartIconRef = useRef(null)
   const navigate = useNavigate()
   const { addToCart } = useCart()
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (!product?.saleEndDate) {
+      setTimeLeft(null)
+      return
+    }
+
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime()
+      const endDate = new Date(product.saleEndDate).getTime()
+      const difference = endDate - now
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+
+        setTimeLeft({ days, hours, minutes, seconds })
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+      }
+    }
+
+    // Calculate immediately
+    calculateTimeLeft()
+
+    // Update every second
+    const timer = setInterval(calculateTimeLeft, 1000)
+
+    return () => clearInterval(timer)
+  }, [product?.saleEndDate])
+
+  // Check if sale is active
+  const isSaleActive = () => {
+    if (!product?.saleStartDate || !product?.saleEndDate) return false
+    
+    const now = new Date().getTime()
+    const startDate = new Date(product.saleStartDate).getTime()
+    const endDate = new Date(product.saleEndDate).getTime()
+    
+    return now >= startDate && now <= endDate
+  }
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return ""
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
   // Fetch product details
   useEffect(() => {
@@ -346,6 +404,53 @@ const ProductDetailPage = () => {
             )}
           </div>
 
+          {/* Sale Countdown Timer */}
+          {product.saleStartDate && product.saleEndDate && isSaleActive() && timeLeft && (
+            <div className="mb-4 p-3 bg-light border rounded">
+              <div className="d-flex align-items-center mb-2">
+                <i className="bi bi-clock text-danger me-2"></i>
+                <h6 className="mb-0 text-danger fw-bold">Sale Ends Soon!</h6>
+              </div>
+              <div className="mb-2">
+                <small className="text-muted">Sale ends on: {formatDate(product.saleEndDate)}</small>
+              </div>
+              <div className="d-flex gap-2">
+                <div className="text-center bg-danger text-white rounded p-2" style={{ minWidth: "60px" }}>
+                  <div className="fw-bold fs-5">{timeLeft.days}</div>
+                  <small>Days</small>
+                </div>
+                <div className="text-center bg-danger text-white rounded p-2" style={{ minWidth: "60px" }}>
+                  <div className="fw-bold fs-5">{timeLeft.hours.toString().padStart(2, '0')}</div>
+                  <small>Hours</small>
+                </div>
+                <div className="text-center bg-danger text-white rounded p-2" style={{ minWidth: "60px" }}>
+                  <div className="fw-bold fs-5">{timeLeft.minutes.toString().padStart(2, '0')}</div>
+                  <small>Minutes</small>
+                </div>
+                <div className="text-center bg-danger text-white rounded p-2" style={{ minWidth: "60px" }}>
+                  <div className="fw-bold fs-5">{timeLeft.seconds.toString().padStart(2, '0')}</div>
+                  <small>Seconds</small>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sale Not Started Yet */}
+          {product.saleStartDate && product.saleEndDate && !isSaleActive() && (
+            <div className="mb-4 p-3 bg-warning border rounded">
+              <div className="d-flex align-items-center mb-2">
+                <i className="bi bi-calendar-event text-warning me-2"></i>
+                <h6 className="mb-0 text-warning fw-bold">Sale Coming Soon!</h6>
+              </div>
+              <div className="mb-2">
+                <small className="text-muted">Sale starts on: {formatDate(product.saleStartDate)}</small>
+              </div>
+              <div className="mb-2">
+                <small className="text-muted">Sale ends on: {formatDate(product.saleEndDate)}</small>
+              </div>
+            </div>
+          )}
+
           <div className="mb-4">{product.description && <p>{product.description}</p>}</div>
 
           {/* Size Selection */}
@@ -468,6 +573,20 @@ const ProductDetailPage = () => {
                     <ListGroup.Item className="d-flex justify-content-between align-items-center">
                       <span className="fw-bold">Seller</span>
                       <span>{formatWebsiteName(product.website)}</span>
+                    </ListGroup.Item>
+                  )}
+                  {product.saleStartDate && (
+                    <ListGroup.Item className="d-flex justify-content-between align-items-center">
+                      <span className="fw-bold">Sale Start Date</span>
+                      <span>{formatDate(product.saleStartDate)}</span>
+                    </ListGroup.Item>
+                  )}
+                  {product.saleEndDate && (
+                    <ListGroup.Item className="d-flex justify-content-between align-items-center">
+                      <span className="fw-bold">Sale End Date</span>
+                      <span className={isSaleActive() ? "text-danger fw-bold" : ""}>
+                        {formatDate(product.saleEndDate)}
+                      </span>
                     </ListGroup.Item>
                   )}
                 </ListGroup>
